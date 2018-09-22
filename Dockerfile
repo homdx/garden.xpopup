@@ -30,10 +30,10 @@ RUN apt install -qq --yes --no-install-recommends \
 
 # https://buildozer.readthedocs.io/en/latest/installation.html#android-on-ubuntu-18-04-64bit
 RUN dpkg --add-architecture i386 && apt update -qq > /dev/null && \
-	apt install -qq --yes --no-install-recommends \
-	build-essential ccache git libncurses5:i386 libstdc++6:i386 libgtk2.0-0:i386 \
-	libpangox-1.0-0:i386 libpangoxft-1.0-0:i386 libidn11:i386 python2.7 \
-	python2.7-dev openjdk-8-jdk unzip zlib1g-dev zlib1g:i386 time
+        apt install -qq --yes --no-install-recommends \
+        build-essential ccache git libncurses5:i386 libstdc++6:i386 libgtk2.0-0:i386 \
+        libpangox-1.0-0:i386 libpangoxft-1.0-0:i386 libidn11:i386 python2.7 \
+        python2.7-dev openjdk-8-jdk unzip zlib1g-dev zlib1g:i386 time
 
 # prepares non root env
 RUN useradd --create-home --shell /bin/bash ${USER}
@@ -42,10 +42,6 @@ RUN usermod -append --groups sudo ${USER}
 RUN echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 WORKDIR ${WORK_DIR}
-
-COPY . .
-
-RUN chown user /home/user/ -Rv
 
 USER ${USER}
 
@@ -60,16 +56,17 @@ RUN cd /tmp/ && buildozer init && buildozer android adb -- version \
 RUN sed s/'name="java.source" value="1.5"'/'name="java.source" value="7"'/ -i ${HOME_DIR}/.buildozer/android/platform/android-sdk-20/tools/ant/build.xml
 RUN sed s/'name="java.target" value="1.5"'/'name="java.target" value="7"'/ -i ${HOME_DIR}/.buildozer/android/platform/android-sdk-20/tools/ant/build.xml
 
-#RUN wget https://www.crystax.net/download/crystax-ndk-10.3.1-linux-x86_64.tar.xz?interactive=true -O ~/.buildozer/crystax.tar.xz \
-#  && cd ~/.buildozer/ \
-#  && time tar -xf crystax.tar.xz && rm ~/.buildozer/crystax.tar.xz
+RUN wget https://www.crystax.net/download/crystax-ndk-10.3.1-linux-x86_64.tar.xz?interactive=true -O ~/.buildozer/crystax.tar.xz \
+  && cd ~/.buildozer/ \
+  && time tar -xf crystax.tar.xz && rm ~/.buildozer/crystax.tar.xz
 
-#USER root
-#RUN chown user /home/user/ -R && chown -R user /home/user/hostcwd
+COPY . .
 
-#USER ${USER}
+#Fix root permissions for added files
+RUN sudo chown user:user ${WORK_DIR} -R
 
 RUN echo '-----Python 3 ----' && time buildozer android debug || echo "Fix build apk" \
     && /bin/true
 
+CMD tail -f /var/log/faillog
 #ENTRYPOINT ["buildozer"]
