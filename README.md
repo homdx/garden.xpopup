@@ -61,6 +61,13 @@ To see a demonstration, you need to perform one of the following:
   
 * Just watch the video: https://youtu.be/UX8gCyEg2J8
 
+Build apk android for armv7 (Python2) with Docker
+==================
+    $docker build -t garden .
+    $docker run -d garden
+    $docker exec -it id_docker /bin/bash
+#### And check result apk in the Docker container:
+    $ls -la *.apk
 
 Version history
 ===============
