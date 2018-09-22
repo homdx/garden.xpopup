@@ -65,7 +65,8 @@ COPY . .
 #Fix root permissions for added files
 RUN sudo chown user:user ${WORK_DIR} -R
 
-RUN echo '-----Python 3 ----' && time buildozer android debug || echo "Fix build apk" \
+RUN echo '-----Python 2 ----' && time buildozer android debug || echo "Fix build apk" \
+    && cp -v ${WORK_DIR}/.buildozer/android/platform/build/dists/garden_xpopup/bin/*-debug.apk ${WORK_DIR}
     && /bin/true
 
 CMD tail -f /var/log/faillog
